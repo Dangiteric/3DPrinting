@@ -1,10 +1,11 @@
 {
-  "seller": {
-    "name": "Eric's 3D Prints",
-    "phoneE164": "+1XXXXXXXXXX",
-    "location": "Local pickup on base",
-    "leadTime": "1–7 days"
-  },
+"seller": {
+  "name": "Eric's 3D Prints",
+  "phoneE164": "+19122708498",
+  "location": "Local pickup on base",
+  "leadTime": "1–7 days",
+  "preferredContact": "WhatsApp / Signal"
+},
   "items": [
     {
       "id": "fidget-gear-cube",
