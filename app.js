@@ -108,11 +108,13 @@ Pickup: ${seller.location}`;
 
     const badgeText = item.featured ? "Popular" : item.category;
 
-    card.innerHTML = `
-      <div class="thumb">
-        <span class="badge">${badgeText}</span>
-      </div>
-      <div class="content">
+card.innerHTML = `
+  <div class="thumb">
+    ${imageHtml}
+    <span class="badge">${badgeText}</span>
+  </div>
+  <div class="content">
+  ;
         <div class="titleRow">
           <div class="title">${item.name}</div>
           <div class="price">${money(item.price)}</div>
