@@ -24,7 +24,7 @@
       </div>
 
       <div class="controls">
-        <input id="search" type="search" placeholder="Search (e.g., 'helmet', 'fidget', 'dragon')…" />
+        <input id="search" type="search" placeholder="Search (helmet, badge, fidget…)" />
         <select id="category">
           <option value="all">All Categories</option>
         </select>
@@ -37,7 +37,7 @@
       </div>
 
       <div class="note">
-        <strong>How ordering works:</strong> Tap the WhatsApp button on an item. Your message opens pre-filled. I confirm price + timeframe before printing.
+        <strong>How ordering works:</strong> Tap the WhatsApp button on an item. Your message opens pre-filled. I confirm price + timeline before printing.
       </div>
     </div>
   </header>
@@ -45,86 +45,40 @@
   <main class="wrap">
     <section id="status" class="status">Loading catalog…</section>
 
-    <!-- Your own catalog items -->
-    <section id="grid" class="grid" aria-live="polite"></section>
+    <section id="grid" class="grid"></section>
 
-    <!-- Featured community picks -->
-    <section class="footerCard" id="featured-picks">
+    <section class="footerCard">
       <h2>Featured Community Picks</h2>
-      <p class="fine">Tap a pick to view the model, or request it directly via WhatsApp.</p>
+      <p class="fine">Popular community models I’m happy to print on request.</p>
       <div id="picksGrid" class="grid"></div>
-      <p class="fine">
-        Note: I only print models consistent with their license/permissions.
-      </p>
     </section>
 
-    <!-- Browse community sites -->
-    <section class="footerCard" id="community-models">
-      <h2>Browse Community Models (Printables / MakerWorld)</h2>
-      <p>
-        Want something that isn’t listed above? Browse community libraries and send me a model link.
-        I’ll confirm licensing/printability and then quote based on size, material, and print time.
-      </p>
-
+    <section class="footerCard">
+      <h2>Browse Community Models</h2>
+      <p>Find a model on Printables or MakerWorld and send me the link.</p>
       <div class="ctaRow">
-        <a class="btn" href="https://www.printables.com/" target="_blank" rel="noopener">Open Printables.com</a>
-        <a class="btn" href="https://makerworld.com/" target="_blank" rel="noopener">Open MakerWorld.com</a>
-      </div>
-
-      <div class="note" style="margin-top:12px;">
-        <strong>How to request a print:</strong>
-        <ol style="margin:8px 0 0; padding-left:18px; color: inherit;">
-          <li>Find a model you like on Printables or MakerWorld.</li>
-          <li>Copy the model link (URL).</li>
-          <li>Tap “Send Model Link (WhatsApp)” and paste the URL + size + color + quantity.</li>
-          <li>I’ll reply with a quote and estimated turnaround.</li>
-        </ol>
-      </div>
-
-      <div class="ctaRow" style="margin-top:12px;">
+        <a class="btn" href="https://www.printables.com/" target="_blank">Printables</a>
+        <a class="btn" href="https://makerworld.com/" target="_blank">MakerWorld</a>
         <a class="btn primary" id="waFromLink" href="#">Send Model Link (WhatsApp)</a>
       </div>
     </section>
 
-    <!-- Custom requests + privacy -->
-    <section class="footerCard" id="custom-requests">
+    <section class="footerCard">
       <h2>Custom Requests</h2>
-      <p>
-        Want something specific? Send a photo/link or describe what you want. I can quote based on size, material, and print time.
-      </p>
-      <ul>
-        <li>Pickup: on base (local)</li>
-        <li>Turnaround: usually 1–7 days depending on size and queue</li>
-        <li>Payment: cash / PayPal / (your preference)</li>
-      </ul>
-
+      <p>Have something specific in mind? I’ll quote based on size, material, and finishing.</p>
       <div class="ctaRow">
         <a class="btn primary" id="waCustom" href="#">Custom Quote (WhatsApp)</a>
       </div>
 
-      <hr class="divider" />
-
-      <h3 class="h3">Prefer Signal?</h3>
       <p class="fine">
-        Signal doesn’t reliably support pre-filled messages from a website.
-        If you tap Signal below, I’ll copy the message to your clipboard and open my Signal contact—just paste the message in chat.
-      </p>
-      <div class="ctaRow">
-        <a class="btn" id="signalOptional" href="#">Contact via Signal (Copy + Open)</a>
-      </div>
-
-      <p class="fine">
-        Privacy: This site doesn’t collect logins, cookies, or payment info. Buttons open WhatsApp/Signal on your device.
-        If you message me, I only use your info to reply about your print request.
+        Privacy: No forms, no cookies, no payments collected on this site.
+        Messages open directly in WhatsApp.
       </p>
       <p class="fine">
-        Disclaimer: Personal side business. Not affiliated with the U.S. Government/DoD.
+        Disclaimer: Personal side business. Not affiliated with the U.S. Government or DoD.
       </p>
     </section>
   </main>
-
-  <!-- Toast -->
-  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <script src="app.js"></script>
 </body>
