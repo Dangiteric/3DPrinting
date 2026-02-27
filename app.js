@@ -5,7 +5,16 @@ function buildSmsLink(phoneE164, message) {
   // iOS/Android behave slightly differently; this format usually works well.
   return `sms:${phoneE164}?&body=${body}`;
 }
+function buildWhatsAppLink(phoneE164, message) {
+  const clean = phoneE164.replace(/\D/g, "");
+  const text = encodeURIComponent(message);
+  return `https://wa.me/${clean}?text=${text}`;
+}
 
+function buildSignalLink(phoneE164, message) {
+  const text = encodeURIComponent(message);
+  return `sgnl://send?phone=${phoneE164}&text=${text}`;
+}
 function buildTelLink(phoneE164) {
   return `tel:${phoneE164}`;
 }
