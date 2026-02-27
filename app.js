@@ -1,18 +1,14 @@
 let CATALOG = null;
 
-// -------------------- Toast (extra clean UX) --------------------
+// -------------------- Toast --------------------
 let toastTimer = null;
 function showToast(message, ms = 1800) {
   const el = document.getElementById("toast");
   if (!el) return;
-
   el.textContent = message;
   el.classList.add("show");
-
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    el.classList.remove("show");
-  }, ms);
+  toastTimer = setTimeout(() => el.classList.remove("show"), ms);
 }
 
 // -------------------- Device detection --------------------
@@ -20,7 +16,7 @@ function isMobileDevice() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
 }
 
-// -------------------- Icons (inline SVG, no hosting needed) --------------------
+// -------------------- Icons --------------------
 function iconWhatsApp() {
   return `
   <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -46,13 +42,8 @@ function buildWhatsAppLink(phoneE164, message) {
   return `https://wa.me/${clean}?text=${text}`;
 }
 
-// Signal deep link works best on mobile; desktop is inconsistent.
-// We’ll still provide a best-effort desktop contact link.
-function buildSignalLink(phoneE164, message) {
-  const text = encodeURIComponent(message);
-  if (isMobileDevice()) {
-    return `sgnl://send?phone=${phoneE164}&text=${text}`;
-  }
+function buildSignalChatLink(phoneE164) {
+  // Reliable Signal contact link (message prefill is NOT reliable from web)
   return `https://signal.me/#p/${encodeURIComponent(phoneE164)}`;
 }
 
@@ -80,30 +71,18 @@ async function copyToClipboard(text) {
   }
 }
 
-/**
- * Signal button click behavior:
- * - Copies the message to clipboard (always useful on desktop)
- * - Tries to open Signal (deep link on mobile)
- * - After a short delay, opens WhatsApp as fallback (in a new tab)
- */
-function attachSignalFallback(anchorEl, signalUrl, waUrl, messageToCopy) {
+// Signal optional handler: copy message + open signal contact
+function attachSignalCopyOpen(anchorEl, phoneE164, messageToCopy) {
   if (!anchorEl) return;
 
   anchorEl.addEventListener("click", async (e) => {
     e.preventDefault();
 
     const copied = await copyToClipboard(messageToCopy);
-    if (copied) showToast("Message copied. Opening Signal…");
-    else showToast("Opening Signal…");
+    if (copied) showToast("Message copied — paste it into Signal.", 2200);
+    else showToast("Couldn’t auto-copy. Copy message manually.", 2200);
 
-    // Try Signal first
-    window.location.href = signalUrl;
-
-    // Fallback to WhatsApp if Signal doesn't open
-    setTimeout(() => {
-      showToast("If Signal didn’t open, WhatsApp is opening…", 2200);
-      window.open(waUrl, "_blank", "noopener");
-    }, 950);
+    window.open(buildSignalChatLink(phoneE164), "_blank", "noopener");
   });
 }
 
@@ -131,7 +110,6 @@ Quantity: ____
 Pickup: ${seller.location}`;
 
     const wa = buildWhatsAppLink(seller.phoneE164, msg);
-    const signal = buildSignalLink(seller.phoneE164, msg);
 
     const card = document.createElement("article");
     card.className = "card";
@@ -156,18 +134,11 @@ Pickup: ${seller.location}`;
         </div>
         <div class="actions">
           <a class="btn primary" href="${wa}" target="_blank" rel="noopener">
-            ${iconWhatsApp()}<span class="label">WhatsApp</span>
-          </a>
-          <a class="btn" href="${signal}" data-signal="1">
-            ${iconSignal()}<span class="label">Signal</span>
+            ${iconWhatsApp()}<span class="label">Order (WhatsApp)</span>
           </a>
         </div>
       </div>
     `;
-
-    // Add fallback behavior to Signal button
-    const signalBtn = card.querySelector('[data-signal="1"]');
-    attachSignalFallback(signalBtn, signal, wa, msg);
 
     grid.appendChild(card);
   }
@@ -181,9 +152,7 @@ function applyFilters() {
 
   let items = [...CATALOG.items];
 
-  if (category !== "all") {
-    items = items.filter(i => i.category === category);
-  }
+  if (category !== "all") items = items.filter(i => i.category === category);
 
   if (search) {
     items = items.filter(i => {
@@ -244,65 +213,39 @@ Pickup: ${CATALOG.seller.location}`;
 
   // Header buttons
   const waGeneralEl = document.getElementById("waGeneral");
-  const signalGeneralEl = document.getElementById("signalGeneral");
   const callGeneralEl = document.getElementById("callGeneral");
 
-  const waGeneralUrl = buildWhatsAppLink(phone, generalMsg);
-  const signalGeneralUrl = buildSignalLink(phone, generalMsg);
-
   if (waGeneralEl) {
-    waGeneralEl.href = waGeneralUrl;
-    waGeneralEl.innerHTML = `${iconWhatsApp()}<span class="label">WhatsApp</span>`;
+    waGeneralEl.href = buildWhatsAppLink(phone, generalMsg);
+    waGeneralEl.innerHTML = `${iconWhatsApp()}<span class="label">Order / Quote (WhatsApp)</span>`;
     waGeneralEl.target = "_blank";
     waGeneralEl.rel = "noopener";
   }
-
-  if (signalGeneralEl) {
-    signalGeneralEl.href = signalGeneralUrl;
-    signalGeneralEl.innerHTML = `${iconSignal()}<span class="label">Signal</span>`;
-    attachSignalFallback(signalGeneralEl, signalGeneralUrl, waGeneralUrl, generalMsg);
-  }
-
   if (callGeneralEl) callGeneralEl.href = buildTelLink(phone);
 
-  // Community model buttons
+  // Community model button
   const waFromLinkEl = document.getElementById("waFromLink");
-  const signalFromLinkEl = document.getElementById("signalFromLink");
-
-  const waFromLinkUrl = buildWhatsAppLink(phone, linkMsg);
-  const signalFromLinkUrl = buildSignalLink(phone, linkMsg);
-
   if (waFromLinkEl) {
-    waFromLinkEl.href = waFromLinkUrl;
-    waFromLinkEl.innerHTML = `${iconWhatsApp()}<span class="label">Send Model Link</span>`;
+    waFromLinkEl.href = buildWhatsAppLink(phone, linkMsg);
+    waFromLinkEl.innerHTML = `${iconWhatsApp()}<span class="label">Send Model Link (WhatsApp)</span>`;
     waFromLinkEl.target = "_blank";
     waFromLinkEl.rel = "noopener";
   }
 
-  if (signalFromLinkEl) {
-    signalFromLinkEl.href = signalFromLinkUrl;
-    signalFromLinkEl.innerHTML = `${iconSignal()}<span class="label">Send via Signal</span>`;
-    attachSignalFallback(signalFromLinkEl, signalFromLinkUrl, waFromLinkUrl, linkMsg);
-  }
-
-  // Custom quote buttons
+  // Custom quote button
   const waCustomEl = document.getElementById("waCustom");
-  const signalCustomEl = document.getElementById("signalCustom");
-
-  const waCustomUrl = buildWhatsAppLink(phone, customMsg);
-  const signalCustomUrl = buildSignalLink(phone, customMsg);
-
   if (waCustomEl) {
-    waCustomEl.href = waCustomUrl;
-    waCustomEl.innerHTML = `${iconWhatsApp()}<span class="label">Custom Quote</span>`;
+    waCustomEl.href = buildWhatsAppLink(phone, customMsg);
+    waCustomEl.innerHTML = `${iconWhatsApp()}<span class="label">Custom Quote (WhatsApp)</span>`;
     waCustomEl.target = "_blank";
     waCustomEl.rel = "noopener";
   }
 
-  if (signalCustomEl) {
-    signalCustomEl.href = signalCustomUrl;
-    signalCustomEl.innerHTML = `${iconSignal()}<span class="label">Signal Quote</span>`;
-    attachSignalFallback(signalCustomEl, signalCustomUrl, waCustomUrl, customMsg);
+  // Optional Signal button (copy + open)
+  const signalOptionalEl = document.getElementById("signalOptional");
+  if (signalOptionalEl) {
+    signalOptionalEl.innerHTML = `${iconSignal()}<span class="label">Contact via Signal (Copy + Open)</span>`;
+    attachSignalCopyOpen(signalOptionalEl, phone, generalMsg);
   }
 
   // Populate categories
@@ -321,9 +264,8 @@ Pickup: ${CATALOG.seller.location}`;
 
   applyFilters();
 
-  // Helpful toast for desktop users
   if (!isMobileDevice()) {
-    showToast("Tip: On desktop, Signal may copy the message and open WhatsApp as backup.", 2600);
+    showToast("Tip: WhatsApp works great on desktop (WhatsApp Web).", 2400);
   }
 }
 
