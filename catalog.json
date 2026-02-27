@@ -1,1 +1,58 @@
-
+{
+  "seller": {
+    "name": "Eric's 3D Prints",
+    "phoneE164": "+1XXXXXXXXXX",
+    "location": "Local pickup on base",
+    "leadTime": "1–7 days"
+  },
+  "items": [
+    {
+      "id": "fidget-gear-cube",
+      "name": "Fidget Gear Cube",
+      "category": "Fidgets",
+      "price": 8,
+      "material": "PLA",
+      "size": "Palm-size",
+      "leadTimeDays": 2,
+      "featured": true,
+      "description": "Clicky/rollable fidget. Multiple color options.",
+      "tags": ["fidget", "desk", "toy"]
+    },
+    {
+      "id": "flexi-dragon-mini",
+      "name": "Flexi Dragon (Mini)",
+      "category": "Toys",
+      "price": 12,
+      "material": "PLA",
+      "size": "20–25cm",
+      "leadTimeDays": 3,
+      "featured": true,
+      "description": "Articulated dragon. Choose color theme.",
+      "tags": ["dragon", "articulated", "gift"]
+    },
+    {
+      "id": "controller-stand",
+      "name": "Game Controller Stand",
+      "category": "Functional",
+      "price": 10,
+      "material": "PLA/PETG",
+      "size": "Standard",
+      "leadTimeDays": 2,
+      "featured": false,
+      "description": "Simple stand for PS/Xbox controllers.",
+      "tags": ["gaming", "stand", "desk"]
+    },
+    {
+      "id": "cosplay-helmet-quote",
+      "name": "Cosplay Helmet (Quote Only)",
+      "category": "Cosplay",
+      "price": 0,
+      "material": "PLA",
+      "size": "Varies",
+      "leadTimeDays": 7,
+      "featured": false,
+      "description": "Helmets are custom quoted based on model + size + finishing. Tap to text for a quote.",
+      "tags": ["helmet", "cosplay", "custom"]
+    }
+  ]
+}
