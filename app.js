@@ -11,11 +11,6 @@ function showToast(message, ms = 1800) {
   toastTimer = setTimeout(() => el.classList.remove("show"), ms);
 }
 
-// -------------------- Device detection --------------------
-function isMobileDevice() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
-}
-
 // -------------------- Icons --------------------
 function iconWhatsApp() {
   return `
@@ -35,7 +30,7 @@ function iconSignal() {
   </svg>`;
 }
 
-// -------------------- Link builders --------------------
+// -------------------- Links --------------------
 function buildWhatsAppLink(phoneE164, message) {
   const clean = (phoneE164 || "").replace(/\D/g, "");
   const text = encodeURIComponent(message);
@@ -43,7 +38,6 @@ function buildWhatsAppLink(phoneE164, message) {
 }
 
 function buildSignalChatLink(phoneE164) {
-  // Reliable Signal contact link (message prefill is NOT reliable from web)
   return `https://signal.me/#p/${encodeURIComponent(phoneE164)}`;
 }
 
@@ -71,13 +65,11 @@ async function copyToClipboard(text) {
   }
 }
 
-// Signal optional handler: copy message + open signal contact
 function attachSignalCopyOpen(anchorEl, phoneE164, messageToCopy) {
   if (!anchorEl) return;
 
   anchorEl.addEventListener("click", async (e) => {
     e.preventDefault();
-
     const copied = await copyToClipboard(messageToCopy);
     if (copied) showToast("Message copied — paste it into Signal.", 2200);
     else showToast("Couldn’t auto-copy. Copy message manually.", 2200);
@@ -86,8 +78,8 @@ function attachSignalCopyOpen(anchorEl, phoneE164, messageToCopy) {
   });
 }
 
-// -------------------- Render --------------------
-function render(items, seller) {
+// -------------------- Render catalog items --------------------
+function renderItems(items, seller) {
   const grid = document.getElementById("grid");
   const status = document.getElementById("status");
   grid.innerHTML = "";
@@ -144,6 +136,61 @@ Pickup: ${seller.location}`;
   }
 }
 
+// -------------------- Render community picks --------------------
+function renderPicks(picks, seller) {
+  const picksGrid = document.getElementById("picksGrid");
+  if (!picksGrid) return;
+
+  picksGrid.innerHTML = "";
+
+  if (!picks || picks.length === 0) {
+    picksGrid.innerHTML = `<div class="status">No featured picks yet. Add links in catalog.json → community_picks.</div>`;
+    return;
+  }
+
+  for (const p of picks) {
+    const msg =
+`Hi! I want to request this community model:
+Name: ${p.name}
+Source: ${p.source}
+Link: ${p.url}
+
+Desired size: ______
+Color(s): ______
+Quantity: ______
+Pickup: ${seller.location}`;
+
+    const wa = buildWhatsAppLink(seller.phoneE164, msg);
+
+    const card = document.createElement("article");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="thumb">
+        <span class="badge">${p.source}</span>
+      </div>
+      <div class="content">
+        <div class="titleRow">
+          <div class="title">${p.name}</div>
+          <div class="price">Pick</div>
+        </div>
+        <div class="desc">${p.notes || "Community model link. License will be confirmed before printing."}</div>
+        <div class="meta">
+          <span class="pill">${p.source}</span>
+        </div>
+        <div class="actions">
+          <a class="btn" href="${p.url}" target="_blank" rel="noopener">Open Model</a>
+          <a class="btn primary" href="${wa}" target="_blank" rel="noopener">
+            ${iconWhatsApp()}<span class="label">Request</span>
+          </a>
+        </div>
+      </div>
+    `;
+
+    picksGrid.appendChild(card);
+  }
+}
+
 // -------------------- Filters --------------------
 function applyFilters() {
   const search = (document.getElementById("search").value || "").toLowerCase().trim();
@@ -175,7 +222,7 @@ function applyFilters() {
     items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
   }
 
-  render(items, CATALOG.seller);
+  renderItems(items, CATALOG.seller);
 }
 
 // -------------------- Init --------------------
@@ -185,13 +232,11 @@ async function init() {
 
   const phone = CATALOG.seller.phoneE164;
 
-  // General message
   const generalMsg =
 `Hi! I’m browsing your 3D print catalog.
 I want to ask about: ______
 Pickup: ${CATALOG.seller.location}`;
 
-  // Custom quote message
   const customMsg =
 `Hi! I want a custom 3D print quote.
 What I want: ______
@@ -201,7 +246,6 @@ Color(s): ______
 Quantity: ______
 Pickup: ${CATALOG.seller.location}`;
 
-  // Model-link quote message
   const linkMsg =
 `Hi! I found a model online and want a quote.
 Model link: ______
@@ -221,9 +265,10 @@ Pickup: ${CATALOG.seller.location}`;
     waGeneralEl.target = "_blank";
     waGeneralEl.rel = "noopener";
   }
+
   if (callGeneralEl) callGeneralEl.href = buildTelLink(phone);
 
-  // Community model button
+  // WhatsApp model link button
   const waFromLinkEl = document.getElementById("waFromLink");
   if (waFromLinkEl) {
     waFromLinkEl.href = buildWhatsAppLink(phone, linkMsg);
@@ -232,7 +277,7 @@ Pickup: ${CATALOG.seller.location}`;
     waFromLinkEl.rel = "noopener";
   }
 
-  // Custom quote button
+  // WhatsApp custom quote
   const waCustomEl = document.getElementById("waCustom");
   if (waCustomEl) {
     waCustomEl.href = buildWhatsAppLink(phone, customMsg);
@@ -241,7 +286,7 @@ Pickup: ${CATALOG.seller.location}`;
     waCustomEl.rel = "noopener";
   }
 
-  // Optional Signal button (copy + open)
+  // Optional Signal (copy + open)
   const signalOptionalEl = document.getElementById("signalOptional");
   if (signalOptionalEl) {
     signalOptionalEl.innerHTML = `${iconSignal()}<span class="label">Contact via Signal (Copy + Open)</span>`;
@@ -262,11 +307,11 @@ Pickup: ${CATALOG.seller.location}`;
   document.getElementById("category").addEventListener("change", applyFilters);
   document.getElementById("sort").addEventListener("change", applyFilters);
 
+  // Render
   applyFilters();
+  renderPicks(CATALOG.community_picks || [], CATALOG.seller);
 
-  if (!isMobileDevice()) {
-    showToast("Tip: WhatsApp works great on desktop (WhatsApp Web).", 2400);
-  }
+  showToast("Catalog loaded.", 1400);
 }
 
 init().catch(err => {
