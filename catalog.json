@@ -1,11 +1,10 @@
 {
-"seller": {
-  "name": "Eric's 3D Prints",
-  "phoneE164": "+19122708498",
-  "location": "Local pickup on base",
-  "leadTime": "1–7 days",
-  "preferredContact": "WhatsApp / Signal"
-},
+  "seller": {
+    "name": "Eric's 3D Prints",
+    "phoneE164": "+4915123456789",
+    "location": "Local pickup on base",
+    "leadTime": "1–7 days"
+  },
   "items": [
     {
       "id": "fidget-gear-cube",
@@ -52,7 +51,7 @@
       "size": "Varies",
       "leadTimeDays": 7,
       "featured": false,
-      "description": "Helmets are custom quoted based on model + size + finishing. Tap to text for a quote.",
+      "description": "Helmets are custom quoted based on model + size + finishing. Tap WhatsApp/Signal for a quote.",
       "tags": ["helmet", "cosplay", "custom"]
     }
   ]
