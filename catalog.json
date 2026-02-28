@@ -230,8 +230,8 @@
         "images/tcgkeychain3.jpg",
         "images/tcgkeychain4.jpg"
       ],
-      "description": "Perfect for base access cards.",
-      "tags": ["toy", "funny", "decoration"]
+      "description": "Fun keychains for Pokemon Lovers.",
+      "tags": ["toy", "funny", "decoration"],
       "options": {
         "Character": [
           "Charizard (card version)",
@@ -251,5 +251,5 @@
           "Ho-Oh"
         ]
       }
-    ]  
+    }  
 }
