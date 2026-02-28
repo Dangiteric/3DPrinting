@@ -205,7 +205,7 @@
       "tags": ["badge", "cac", "functional"]
     },
     { 
-      "id": "tcgkeychgain",
+      "id": "tcg-keychain",
       "name": "TCG Keychain",
       "category": "Community",
       "price": 0,
@@ -213,7 +213,7 @@
       "size": "Standard",
       "leadTimeDays": 2,
       "featured": true,
-      "image": [ 
+      "images": [ 
         "images/tcgkeychain.jpg",
         "images/tcgkeychain1.jpg",
         "images/tcgkeychain2.jpg",
