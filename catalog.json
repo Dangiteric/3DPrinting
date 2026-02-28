@@ -28,7 +28,12 @@
       "size": "Standard",
       "leadTimeDays": 2,
       "featured": false,
-      "image": "images/derpyderpy.jpg",
+      "images": [
+        "images/derpyderpy.jpg",
+        "images/derpyderpy1.jpg",
+        "images/derpyderpy2.jpg",
+        "images/derpyderpy3.jpg"
+      ],
       "description": "Funny play on the popular Pokemon franchise, but a little Derpy",
       "tags": ["pokemon", "funny", "toy"],
       "options": {
