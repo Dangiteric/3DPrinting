@@ -24,12 +24,12 @@
       "name": "DerpyMon (Pokémon)",
       "category": "Community",
       "price": 0,
-      "material": "PLA"
-      "size": "Standard"
+      "material": "PLA",
+      "size": "Standard",
       "leadTimeDays": 2,
       "featured": false,
       "image": "images/derpyderpy.jpg",
-      "description": "Funny play on the popular Pokemon franchise, but a little Derpy"
+      "description": "Funny play on the popular Pokemon franchise, but a little Derpy",
       "tags": ["pokemon", "funny", "toy"]
     },
     {
@@ -37,12 +37,12 @@
       "name": "Flexible Fabric-Style World Flags",
       "category": "Community",
       "price": 0,
-      "material": "PLA"
-      "size": "Standard"
+      "material": "PLA",
+      "size": "Standard",
       "leadTimeDays": 2,
       "featured": false,
       "image": "images/Flexi-Flags.jpg",
-      "description": "Great for offices and lockers."
+      "description": "Great for offices and lockers.",
       "tags": ["office", "decoration", "flexible"]
     },
     {
@@ -50,12 +50,12 @@
       "name": "Modular Badge Holder (CAC/RSA)",
       "category": "Community",
       "price": 0,
-      "material": "PLA"
-      "size": "Standard"
+      "material": "PLA",
+      "size": "Standard",
       "leadTimeDays": 2,
       "featured": true,
       "image": "images/modularbadges.jpg",
-      "description": "Perfect for base access cards."
+      "description": "Perfect for base access cards.",
       "tags": ["badge", "cac", "functional"]
     }
   ]
