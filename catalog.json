@@ -43,7 +43,7 @@
       "featured": false,
       "image": "images/Flexi-Flags.jpg",
       "description": "Great for offices and lockers.",
-      "tags": ["office", "decoration", "flexible"]
+      "tags": ["office", "decoration", "flexible"],
       "options": {
         "Country": [
           "Albania",
