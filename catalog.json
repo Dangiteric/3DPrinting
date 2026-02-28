@@ -32,7 +32,7 @@
       "description": "Funny play on the popular Pokemon franchise, but a little Derpy",
       "tags": ["pokemon", "funny", "toy"],
       "options": {
-        "DerpyMon": [
+        "Character": [
           "Pikachu",
           "Bulbasuar",
           "Squirtle",
