@@ -204,7 +204,7 @@
       "description": "Perfect for base access cards.",
       "tags": ["badge", "cac", "functional"]
     },
-     { 
+    { 
       "id": "tcgkeychgain",
       "name": "TCG Keychain",
       "category": "Community",
