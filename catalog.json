@@ -232,6 +232,24 @@
       ],
       "description": "Perfect for base access cards.",
       "tags": ["toy", "funny", "decoration"]
-    }
+      "options": {
+        "Character": [
+          "Charizard (card version)",
+          "Pikachu (card version)",
+          "Mewtwo (card version)",
+          "Haunter (card version)",
+          "Snorlax (card version)",
+          "Venasaur (card version)",
+          "Blastoise (card version)",
+          "Gengar (card version)",
+          "Gengar",
+          "Charizard",
+          "Alakazam",
+          "Ivysaur",
+          "Wartortle",
+          "Charmeleon",
+          "Ho-Oh"
+        ]
+      }
   ]
 }
