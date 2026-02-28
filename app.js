@@ -1,235 +1,280 @@
-let CATALOG = null;
-
-function buildWhatsAppLink(phone, message) {
-  const clean = phone.replace(/\D/g, "");
-  return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+:root{
+  --bg:#0b0f19;
+  --card:#11182a;
+  --muted:#9fb0d0;
+  --text:#e9f0ff;
+  --border:rgba(255,255,255,.10);
+  --accent:#4ea1ff;
+  --accent2:#7c5cff;
 }
 
-function buildTelLink(phone) {
-  return `tel:${phone}`;
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 800px at 20% -10%, rgba(124,92,255,.25), transparent 60%),
+    radial-gradient(1000px 700px at 80% 0%, rgba(78,161,255,.18), transparent 55%),
+    var(--bg);
 }
 
-function money(price) {
-  if (!price || price === 0) return "Quote";
-  return `$${price}`;
+.wrap{
+  max-width:1100px;
+  margin:0 auto;
+  padding:18px;
 }
 
-function uniqueCategories(items) {
-  return [...new Set(items.map(i => i.category).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+.header{
+  position:sticky;
+  top:0;
+  backdrop-filter: blur(10px);
+  background: rgba(11,15,25,.75);
+  border-bottom:1px solid var(--border);
+  z-index:10;
 }
 
-function slugify(str) {
-  return String(str || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+.brand{
+  display:flex;
+  gap:14px;
+  align-items:center;
 }
 
-function buildOrderMessage(item, seller, selections = {}) {
-  const lines = [];
-  lines.push(`Hi! I'm interested in:`);
-  lines.push(`${item.name}`);
-  lines.push("");
-  // If item has options, include selections
-  if (item.options && typeof item.options === "object") {
-    lines.push("Selections:");
-    for (const key of Object.keys(item.options)) {
-      const chosen = selections[key] || "";
-      lines.push(`- ${key}: ${chosen || "______"}`);
-    }
-    lines.push("");
-  }
-
-  lines.push(`Desired size: ______`);
-  lines.push(`Color(s): ______`);
-  lines.push(`Quantity: ______`);
-  lines.push(`Pickup: ${seller.location}`);
-  return lines.join("\n");
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  display:grid;
+  place-items:center;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  font-weight:800;
 }
 
-function renderItems(items, seller) {
-  const grid = document.getElementById("grid");
-  const status = document.getElementById("status");
-  grid.innerHTML = "";
+h1{ margin:0; font-size:20px; }
+.sub{ margin:2px 0 0; color:var(--muted); font-size:13px; }
 
-  status.textContent = `${items.length} item(s) • ${seller.location} • Lead time ${seller.leadTime}`;
-
-  for (const item of items) {
-    const imageHtml = item.image
-      ? `<img src="${item.image}" alt="${item.name}" loading="lazy">`
-      : `<div class="imgFallback">No image</div>`;
-
-    const badgeText = item.featured ? "Popular" : (item.category || "Item");
-
-    const card = document.createElement("article");
-    card.className = "card";
-
-    // Build option selects (if any)
-    let optionsHtml = "";
-    if (item.options && typeof item.options === "object") {
-      const optionKeys = Object.keys(item.options);
-      if (optionKeys.length) {
-        optionsHtml += `<div class="optionsWrap">`;
-        for (const key of optionKeys) {
-          const id = `opt-${slugify(item.id)}-${slugify(key)}`;
-          const values = Array.isArray(item.options[key]) ? item.options[key] : [];
-          optionsHtml += `
-            <label class="optLabel" for="${id}">${key}</label>
-            <select class="optSelect" id="${id}" data-itemid="${item.id}" data-optkey="${key}">
-              <option value="">Choose ${key}…</option>
-              ${values.map(v => `<option value="${String(v).replace(/"/g, "&quot;")}">${v}</option>`).join("")}
-            </select>
-          `;
-        }
-        optionsHtml += `</div>`;
-      }
-    }
-
-    // Initial message/link (may be updated after selection)
-    const initialMsg = buildOrderMessage(item, seller, {});
-    const initialWa = buildWhatsAppLink(seller.phoneE164, initialMsg);
-
-    card.innerHTML = `
-      <div class="thumb">
-        ${imageHtml}
-        <span class="badge">${badgeText}</span>
-      </div>
-      <div class="content">
-        <div class="titleRow">
-          <div class="title">${item.name}</div>
-          <div class="price">${money(item.price)}</div>
-        </div>
-
-        <div class="desc">${item.description || ""}</div>
-
-        ${optionsHtml}
-
-        <div class="actions">
-          <a class="btn primary" data-orderbtn="1" href="${initialWa}" target="_blank" rel="noopener">
-            Order (WhatsApp)
-          </a>
-        </div>
-      </div>
-    `;
-
-    // If item has options, wire up select(s) to update the WhatsApp link and button enabled/disabled
-    if (item.options && typeof item.options === "object") {
-      const orderBtn = card.querySelector('[data-orderbtn="1"]');
-      const selects = card.querySelectorAll(".optSelect");
-
-      const selections = {}; // key -> value
-
-      function refreshOrderLink() {
-        // Update selections
-        selects.forEach(sel => {
-          const key = sel.getAttribute("data-optkey");
-          selections[key] = sel.value;
-        });
-
-        const msg = buildOrderMessage(item, seller, selections);
-        orderBtn.href = buildWhatsAppLink(seller.phoneE164, msg);
-
-        // Disable ordering until all options are selected
-        const allChosen = Object.keys(item.options).every(k => (selections[k] || "").trim().length > 0);
-        if (!allChosen) {
-          orderBtn.classList.add("disabled");
-          orderBtn.setAttribute("aria-disabled", "true");
-          orderBtn.addEventListener("click", blockIfDisabled);
-        } else {
-          orderBtn.classList.remove("disabled");
-          orderBtn.removeAttribute("aria-disabled");
-        }
-      }
-
-      function blockIfDisabled(e) {
-        if (orderBtn.classList.contains("disabled")) {
-          e.preventDefault();
-        }
-      }
-
-      selects.forEach(sel => sel.addEventListener("change", refreshOrderLink));
-
-      // Initialize disabled state
-      refreshOrderLink();
-    }
-
-    grid.appendChild(card);
-  }
+.controls{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns: 1.2fr .7fr .7fr;
+  gap:10px;
 }
 
-function applyFilters() {
-  const search = (document.getElementById("search").value || "").toLowerCase().trim();
-  const category = document.getElementById("category").value;
-  const sort = document.getElementById("sort").value;
-
-  let items = [...CATALOG.items];
-
-  if (category !== "all") {
-    items = items.filter(i => i.category === category);
-  }
-
-  if (search) {
-    items = items.filter(i => {
-      const optionText = i.options
-        ? Object.values(i.options).flat().join(" ")
-        : "";
-      const hay = [
-        i.name, i.category, i.description,
-        ...(i.tags || []),
-        i.material, i.size, i.id,
-        optionText
-      ].join(" ").toLowerCase();
-      return hay.includes(search);
-    });
-  }
-
-  if (sort === "featured") {
-    items.sort((a,b) => (b.featured === true) - (a.featured === true));
-  } else if (sort === "priceAsc") {
-    items.sort((a,b) => (a.price || 9999) - (b.price || 9999));
-  } else if (sort === "priceDesc") {
-    items.sort((a,b) => (b.price || 0) - (a.price || 0));
-  } else if (sort === "nameAsc") {
-    items.sort((a,b) => (a.name || "").localeCompare(b.name || ""));
-  }
-
-  renderItems(items, CATALOG.seller);
+.controls input,
+.controls select{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: rgba(17,24,42,.7);
+  color:var(--text);
+  outline:none;
 }
 
-async function init() {
-  const res = await fetch("catalog.json", { cache: "no-store" });
-  CATALOG = await res.json();
+.controls input::placeholder{ color:rgba(159,176,208,.75); }
 
-  const seller = CATALOG.seller;
-
-  document.getElementById("waGeneral").href =
-    buildWhatsAppLink(seller.phoneE164, "Hi! I'm browsing your 3D print catalog.");
-  document.getElementById("callGeneral").href =
-    buildTelLink(seller.phoneE164);
-  document.getElementById("waCustom").href =
-    buildWhatsAppLink(seller.phoneE164, "Hi! I’d like a custom 3D print quote.");
-  document.getElementById("waFromLink").href =
-    buildWhatsAppLink(seller.phoneE164, "Hi! I found a model online I’d like printed. Link: ______");
-
-  // Populate categories
-  const catSelect = document.getElementById("category");
-  for (const c of uniqueCategories(CATALOG.items)) {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    catSelect.appendChild(opt);
-  }
-
-  document.getElementById("search").addEventListener("input", applyFilters);
-  document.getElementById("category").addEventListener("change", applyFilters);
-  document.getElementById("sort").addEventListener("change", applyFilters);
-
-  applyFilters();
+.ctaRow{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-top:10px;
+  flex-wrap:wrap;
 }
 
-init().catch(err => {
-  console.error(err);
-  const status = document.getElementById("status");
-  if (status) status.textContent = "Failed to load catalog.json. Check JSON formatting and file names.";
-});
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  color:var(--text);
+  text-decoration:none;
+  background: rgba(17,24,42,.6);
+  cursor:pointer;
+}
+
+.btn.primary{
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border:none;
+  font-weight:700;
+}
+
+.btn:hover{ filter:brightness(1.05); }
+
+.btn.disabled{
+  opacity:.55;
+  pointer-events:none;
+}
+
+.note{
+  margin-top:12px;
+  padding:10px 12px;
+  border:1px dashed rgba(255,255,255,.18);
+  border-radius:12px;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.status{
+  margin:16px 0;
+  color: var(--muted);
+  font-size:13px;
+}
+
+.grid{
+  display:grid;
+  gap:14px;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+}
+
+@media (max-width: 920px){
+  .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .controls{ grid-template-columns: 1fr 1fr; }
+  .controls select:last-child{ grid-column: span 2; }
+}
+
+@media (max-width: 560px){
+  .grid{ grid-template-columns: 1fr; }
+  .controls{ grid-template-columns: 1fr; }
+  .controls select:last-child{ grid-column:auto; }
+}
+
+.card{
+  border:1px solid var(--border);
+  background: rgba(17,24,42,.70);
+  border-radius:16px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-height:100%;
+}
+
+.thumb{
+  height:160px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--border);
+  background: linear-gradient(135deg, rgba(78,161,255,.22), rgba(124,92,255,.18));
+}
+
+.thumb img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.badge{
+  position:absolute;
+  bottom:10px;
+  left:10px;
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(11,15,25,.55);
+}
+
+.imgFallback{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.content{
+  padding:12px 12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  flex:1;
+}
+
+.titleRow{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.title{ font-weight:800; }
+.price{ font-weight:800; white-space:nowrap; }
+
+.desc{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.35;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:auto;
+}
+
+.actions a{ flex:1; }
+
+.footerCard{
+  margin:20px 0 30px;
+  border:1px solid var(--border);
+  background: rgba(17,24,42,.55);
+  border-radius:16px;
+  padding:14px;
+}
+
+.fine{
+  margin-top:10px;
+  font-size:12px;
+  color:rgba(159,176,208,.80);
+}
+
+/* Dropdown options */
+.optionsWrap{
+  margin-top: 8px;
+  display:grid;
+  gap:8px;
+}
+
+.optLabel{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.optSelect{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: rgba(17,24,42,.7);
+  color:var(--text);
+  outline:none;
+}
+
+/* Side-scroll carousel */
+.carousel{
+  height:100%;
+  width:100%;
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carousel img{
+  flex:0 0 100%;
+  height:100%;
+  width:100%;
+  object-fit:cover;
+  scroll-snap-align:start;
+}
+
+.carousel::-webkit-scrollbar{ height:8px; }
+.carousel::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.15);
+  border-radius: 999px;
+}
