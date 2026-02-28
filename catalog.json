@@ -44,6 +44,8 @@
       "image": "images/Flexi-Flags.jpg",
       "description": "Great for offices and lockers.",
       "tags": ["office", "decoration", "flexible"]
+      "options": {
+        "Country": ["USA", "Germany", "UK", "France", "Italy", "Spain"]
     },
     {
       "id": "badge-holder",
